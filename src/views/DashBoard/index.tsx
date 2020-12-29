@@ -290,7 +290,6 @@ const DashBoard: React.FC = () => {
     }
 
     return (
-        <>
             <Container>
                 <ContentHeader title="DashBoard" lineColor="#F7931B">
                     <SelectInput
@@ -346,7 +345,6 @@ const DashBoard: React.FC = () => {
                         data={relationGainsRecurrentEventual} />
                 </Content>
             </Container>
-        </>
     );
 }
 export default DashBoard;

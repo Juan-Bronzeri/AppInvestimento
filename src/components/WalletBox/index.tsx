@@ -45,7 +45,6 @@ const WalletBox: React.FC<IWalletBoxProps> = ({
                         separator='.'
                         decimal=','
                         decimals={2}
-
                     />
                 </h1>
                 <small>{footerLabel}</small>

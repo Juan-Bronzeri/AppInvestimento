@@ -70,6 +70,12 @@ const Aside: React.FC = () => {
                         Saídas
                     </MenuItemLink>
                 </Link>
+                <Link to="/moves">
+                    <MenuItemLink>
+                        <MdArrowDownward />
+                        Movimentações
+                    </MenuItemLink>
+                </Link>
                 <Link to="/">
                     <MenuItemButton onClick={signOut}>
                         <MdExitToApp />

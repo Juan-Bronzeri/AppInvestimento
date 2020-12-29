@@ -100,7 +100,7 @@ const List: React.FC<IRouteParams> = ({ match }) => {
         try {
             const parseMonth = Number(month);
             setMonthSelected(parseMonth);
-        }catch{
+        } catch {
             throw new Error('Invalid month value. Is accept 0 - 24.')
         }
     }
@@ -109,7 +109,7 @@ const List: React.FC<IRouteParams> = ({ match }) => {
         try {
             const parseYear = Number(Year);
             setYearSelected(parseYear);
-        }catch{
+        } catch {
             throw new Error('Invalid Year value. Is accept integer numbers.')
         }
     }
@@ -138,59 +138,57 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     }, [pageData, monthSelected, yearSelected, frequencyFilterSelected]);
 
     return (
-        <>
-            <Container>
-                <ContentHeader title={pageData.title} lineColor={pageData.lineColor}>
-                    <SelectInput
-                        options={months}
-                        onChange={(e) => handleMonthSelected(e.target.value)}
-                        defaultValue={monthSelected}
-                    />
-                    <SelectInput
-                        options={years}
-                        onChange={(e) => handleYearSelected(e.target.value)}
-                        defaultValue={yearSelected}
-                    />
-                </ContentHeader>
-                <Filters>
-                    <button
-                        type="button"
-                        className={`
+        <Container>
+            <ContentHeader title={pageData.title} lineColor={pageData.lineColor}>
+                <SelectInput
+                    options={months}
+                    onChange={(e) => handleMonthSelected(e.target.value)}
+                    defaultValue={monthSelected}
+                />
+                <SelectInput
+                    options={years}
+                    onChange={(e) => handleYearSelected(e.target.value)}
+                    defaultValue={yearSelected}
+                />
+            </ContentHeader>
+            <Filters>
+                <button
+                    type="button"
+                    className={`
                         tag-filter 
                         tag-filter-recurrent
                         ${frequencyFilterSelected.includes('recorrente') && 'tag-actived'}
                         `}
-                        onClick={() => handleFrequencyClick('recorrente')}
-                    >
-                        Recorrentes
+                    onClick={() => handleFrequencyClick('recorrente')}
+                >
+                    Recorrentes
                     </button>
-                    <button
-                        type="button"
-                        className={`
+                <button
+                    type="button"
+                    className={`
                         tag-filter 
                         tag-filter-eventual
                         ${frequencyFilterSelected.includes('eventual') && 'tag-actived'}
                         `}
-                        onClick={() => handleFrequencyClick('eventual')}
-                    >
-                        Eventuais
+                    onClick={() => handleFrequencyClick('eventual')}
+                >
+                    Eventuais
                     </button>
-                </Filters>
-                <Content>
-                    {
-                        data.map(item => (
-                            <HistoryFinanceCard
-                                key={item.id}
-                                tagColor={item.tagColor}
-                                title={item.description}
-                                subtitle={item.dateFormated}
-                                amount={item.amountFormated}
-                            />
-                        ))
-                    }
-                </Content>
-            </Container>
-        </>
+            </Filters>
+            <Content>
+                {
+                    data.map(item => (
+                        <HistoryFinanceCard
+                            key={item.id}
+                            tagColor={item.tagColor}
+                            title={item.description}
+                            subtitle={item.dateFormated}
+                            amount={item.amountFormated}
+                        />
+                    ))
+                }
+            </Content>
+        </Container>
     );
 }
 export default List;
