@@ -5,8 +5,7 @@ import ContentHeader from '../../components/ContentHeader';
 import SelectInput from '../../components/SelectInput';
 import HistoryFinanceCard from '../../components/HistoryFinanceCard';
 
-import gains from '../../repositories/gains';
-import expenses from '../../repositories/expenses';
+import active from '../../repositories/active';
 
 import formatCurrency from '../../utils/formatCurrency';
 import formatDate from '../../utils/formatDate';
@@ -29,8 +28,9 @@ interface IRouteParams {
 interface IData {
     id: string;
     description: string;
-    amountFormated: string;
-    frequency: string;
+    price: number;
+    amount: string;
+    total: string;
     dateFormated: string;
     tagColor: string;
 }
@@ -39,24 +39,19 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     const [data, setData] = useState<IData[]>([]);
     const [monthSelected, setMonthSelected] = useState<number>(new Date().getMonth() + 1);
     const [yearSelected, setYearSelected] = useState<number>(new Date().getFullYear());
-    const [frequencyFilterSelected, setFrequencyFilterSelected] = useState(['recorrente', 'eventual']);
+    const [frequencyFilterSelected, setFrequencyFilterSelected] = useState(['gain', 'lose']);
 
+    const activeValueDay = 15;
     const movimentType = match.params.type;
+    console.log(movimentType);
 
     const pageData = useMemo(() => {
-        return movimentType === 'entry-balance' ?
-            {
-                title: 'Entradas',
-                lineColor: '#53cc5d',
-                data: gains
-            }
-            :
-            {
-                title: 'Saídas',
-                lineColor: '#e44c4e',
-                data: expenses
-            }
-    }, [movimentType]);
+        return {
+            title: 'Entradas',
+            lineColor: '#53cc5d',
+            data: active
+        }
+    }, []);
 
     const years = useMemo(() => {
         let uniqueYears: number[] = [];
@@ -121,17 +116,19 @@ const List: React.FC<IRouteParams> = ({ match }) => {
             const date = new Date(item.date);
             const month = date.getMonth() + 1;
             const year = date.getFullYear();
+            const frequency = activeValueDay + (activeValueDay * 0.1) < Number(item.price) ? 'gain' : 'lose'
 
-            return month === monthSelected && year === yearSelected && yearSelected && frequencyFilterSelected.includes(item.frequency);
+            return month === monthSelected && year === yearSelected && frequencyFilterSelected.includes(frequency);
         });
         const formatedData = filteredData.map(item => {
             return {
                 id: uuid_v4(),
-                description: item.description,
-                amountFormated: formatCurrency(Number(item.amount)),
-                frequency: item.frequency,
+                description: item.Active,
+                amount: item.amount,
+                price: Number(item.price),
+                total: formatCurrency(Number(item.price) * Number(item.amount)),
                 dateFormated: formatDate(item.date),
-                tagColor: item.frequency === 'recorrente' ? '#4e41f0' : '#e44c4e'
+                tagColor: activeValueDay + (activeValueDay * 0.1) < Number(item.price) ? '#00cc29' : '#85040b'
             }
         });
         setData(formatedData);
@@ -157,22 +154,22 @@ const List: React.FC<IRouteParams> = ({ match }) => {
                     className={`
                         tag-filter 
                         tag-filter-recurrent
-                        ${frequencyFilterSelected.includes('recorrente') && 'tag-actived'}
+                        ${frequencyFilterSelected.includes('gain') && 'tag-actived'}
                         `}
-                    onClick={() => handleFrequencyClick('recorrente')}
+                    onClick={() => handleFrequencyClick('gain')}
                 >
-                    Recorrentes
+                    Ganhos
                     </button>
                 <button
                     type="button"
                     className={`
                         tag-filter 
                         tag-filter-eventual
-                        ${frequencyFilterSelected.includes('eventual') && 'tag-actived'}
+                        ${frequencyFilterSelected.includes('lose') && 'tag-actived'}
                         `}
-                    onClick={() => handleFrequencyClick('eventual')}
+                    onClick={() => handleFrequencyClick('lose')}
                 >
-                    Eventuais
+                    Perdas
                     </button>
             </Filters>
             <Content>
@@ -183,7 +180,10 @@ const List: React.FC<IRouteParams> = ({ match }) => {
                             tagColor={item.tagColor}
                             title={item.description}
                             subtitle={item.dateFormated}
-                            amount={item.amountFormated}
+                            price = {item.price}
+                            total={item.total}
+                            amount={item.amount}
+                            activeValueDay = {activeValueDay}
                         />
                     ))
                 }

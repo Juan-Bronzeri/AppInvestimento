@@ -48,7 +48,7 @@ export const FormActiveCounter = styled.div`
 
     display: relative;
 
-    padding: 30px 20px;
+    padding: 10px 20px;
     background-color: transparent;
     > h3 {
         text-align: center;
@@ -58,17 +58,59 @@ export const FormActiveCounter = styled.div`
 
 export const NameActive = styled.div`
     margin-bottom: 25px;
+    > h1 {
+        font-size: 40px;
+    }
 `;
 
-export const ValueRate = styled.div`
+export const Valuebroker = styled.div`
     display: flex;
 
+    margin-top: 10px;
+
+    > input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        
+    }
+    > input {
+        border-radius: 5px;
+        padding-left: 5px;
+        margin-left: 10px;
+        width: 10%;
+}
+`;
+
+export const ValueB3 = styled.div`
+    display: flex;
+
+    margin-top: 10px;
+
+    > input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        
+    }
     > input {
         border-radius: 5px;
         padding-left: 5px;
         margin-left: 10px;
         width: 10%;
     }
+`;
+
+export const ValueActive = styled.div`
+    display: flex;
+    margin-top: 10px;
+
+    > input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        
+    }
+    > input {
+        border-radius: 5px;
+        padding-left: 5px;
+        margin-left: 10px;
+        width: 10%;
+}
 `;
 
 export const CounterActive = styled.div`
@@ -81,13 +123,16 @@ export const CounterActive = styled.div`
     > span {
         justify-content: center;
     }
+    > input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        
+    }
     > input {
         font-size: 45px;
         text-align: center;
         width: 100%;
         background-color:transparent;
     }
-    
 `;
 
 const iconCSS = css`

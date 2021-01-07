@@ -8,22 +8,30 @@ interface IHistoryFinanceCardProps {
     tagColor: string;
     title: string;
     subtitle: string;
+    price: number;
+    total: string;
     amount: string;
+    activeValueDay: number;
 }
 
 const HistoryFinanceCard: React.FC<IHistoryFinanceCardProps> = ({
     tagColor,
     title,
     subtitle,
-    amount
+    price,
+    amount,
+    total,
+    activeValueDay
 }) => (
     <Container>
-        <Tag color={tagColor} />
+        <Tag color={tagColor}/>
         <div>
-            <span>{title}</span>
+            <span>{amount} - {title}</span>
             <small>{subtitle}</small>
         </div>
-        <h3>{amount}</h3>
+        <h3>
+            {total}
+        </h3>
     </Container>
 );
 export default HistoryFinanceCard;

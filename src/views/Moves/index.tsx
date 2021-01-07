@@ -1,4 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, Component } from 'react';
+import { useEffect } from 'react';
+
+import activeGain from '../../repositories/active';
 
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -14,12 +17,34 @@ import {
   MinusActive,
   PlusButton,
   MinusButton,
-  ValueRate
+  ValueB3,
+  ValueActive,
+  Valuebroker
 } from './styles';
 
 const Moves: React.FC = () => {
-
+  const [active, setActive] = useState('');
   const [count, setCount] = useState(0);
+  const [valueB3, setValueB3] = useState(0);
+  const [valueBroker, setValueBroker] = useState(0);
+  const [valueActive, setValueActive] = useState(0);
+
+  useEffect(() => {
+    (document.getElementById('CountInput') as HTMLInputElement).value = String(count);
+    (document.getElementById('B3input') as HTMLInputElement).value = String(valueB3);
+    (document.getElementById('BrokerInput') as HTMLInputElement).value = String(valueBroker);
+    (document.getElementById('ValueActiveInput') as HTMLInputElement).value = String(valueActive);
+    (document.getElementById('ActiveInput') as HTMLInputElement).value = active;
+  }, [count, valueB3, valueBroker, valueActive]);
+
+  const pageData = useMemo(() => {
+    return {
+        title: 'Entradas',
+        lineColor: '#53cc5d',
+        data: activeGain
+      }
+  },[]);
+
   return (
     <Container>
       <Form >
@@ -28,29 +53,51 @@ const Moves: React.FC = () => {
         </FormTitle>
         <Input
           type='text'
+          id='ActiveInput'
+          onChange={(e) => { setActive(e.target.value); }}
           placeholder='Ação...'
           required
         />
         <FormActiveCounter>
           <NameActive>
-            <h1>Petr4</h1>
-            <ValueRate>
-              <h4>Valor da Taxa</h4>
+            <h1>{active}</h1>
+            <ValueB3>
+              <h4>Taxa B3</h4>
               <input type='number'
-              placeholder={String(count)}
-              min='0'
-              required
+                id='B3input'
+                onChange={(e) => { setValueB3(Number(e.target.value)); }}
+                min='0'
+                required
               />
-            </ValueRate>
+            </ValueB3>
+            <Valuebroker>
+              <h4>Taxa de corretagem</h4>
+              <input type='number'
+                id='BrokerInput'
+                onChange={(e) => { setValueBroker(Number(e.target.value)); }}
+                min='0'
+                required
+              />
+            </Valuebroker>
+            <ValueActive>
+              <h4>Preço por unidade</h4>
+              <input type='number'
+                id='ValueActiveInput'
+                onChange={(e) => { setValueActive(Number(e.target.value)); }}
+                min='0'
+                required
+              />
+            </ValueActive>
           </NameActive>
           <h3>Quantidade de ações</h3>
           <CounterActive>
             <MinusButton>
-              <MinusActive onClick={() => count > 0 ? setCount(count - 1) : 0 } />
+              <MinusActive onClick={() => count > 0 ? setCount(count - 1) : 0} />
             </MinusButton>
             <input
-              type='text'
-              placeholder={String(count)}
+              type='number'
+              id='CountInput'
+              onChange={(e) => { setCount(Number(e.target.value)); }}
               required
             />
             <PlusButton>

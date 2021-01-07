@@ -13,11 +13,21 @@ import {
     Form,
     FormTitle
 } from './styles';
+import { signInRequest } from '../../store/modules/auth/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { StoreState } from '../../store/createStore';
 
 const SignIn: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
+    const { loadingSignInRequest, isSignedIn, error } = useSelector((state: StoreState) => state.auth);
+    const dispatch = useDispatch();
+
+    console.log('LOADING:', loadingSignInRequest);
+    console.log('SIGNED:', isSignedIn);
+    console.log('ERROR:', error);
+    
     const { signIn } = useAuth();
 
     return (
@@ -40,7 +50,7 @@ const SignIn: React.FC = () => {
                     required
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <Button type="submit">Acessar</Button>
+                <Button type="submit" onClick={() => dispatch(signInRequest({ email: 'test@email.com', password: '12345678' }))}>Acessar</Button>
             </Form>
         </Container>
     );

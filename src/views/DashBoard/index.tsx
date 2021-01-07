@@ -6,10 +6,10 @@ import WalletBox from '../../components/WalletBox';
 import MenssageBox from '../../components/MessageBox';
 import PieChartBox from '../../components/PieChartBox';
 import HistoryBox from '../../components/HistoryBox';
-import BarChartBox from '../../components/BarChartBox';
+import HistoryBoxGains from '../../components/HistoryBoxGains';
 
-import expenses from '../../repositories/expenses';
-import gains from '../../repositories/gains';
+import vendas from '../../repositories/vendas';
+import compras from '../../repositories/compra';
 import listOfMonths from '../../utils/months';
 
 import happyImg from '../../assets/happy.svg';
@@ -29,7 +29,7 @@ const DashBoard: React.FC = () => {
     const years = useMemo(() => {
         let uniqueYears: number[] = [];
 
-        [...expenses, ...gains].forEach(item => {
+        [...vendas, ...compras].forEach(item => {
             const date = new Date(item.date);
             const year = date.getFullYear();
 
@@ -54,17 +54,38 @@ const DashBoard: React.FC = () => {
         })
     }, []);
 
-    const totalExpenses = useMemo(() => {
+    const totalSells = useMemo(() => {
         let total: number = 0;
+        let totalGain: number = 0;
 
-        expenses.forEach(item => {
+        vendas.forEach(item => {
             const date = new Date(item.date);
             const year = date.getFullYear();
             const month = date.getMonth() + 1;
 
             if (month === monthSelected && year === yearSelected) {
                 try {
-                    total += Number(item.amount);
+                    total += Number(item.price);
+                    totalGain += Number(item.gain);
+                } catch {
+                    throw new Error('Invalid amount! Amount must be number');
+                }
+            }
+        });
+        return total;
+    }, [monthSelected, yearSelected])
+
+    const totalBuys = useMemo(() => {
+        let total: number = 0;
+
+        compras.forEach(item => {
+            const date = new Date(item.date);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+
+            if (month === monthSelected && year === yearSelected) {
+                try {
+                    total += Number(item.price);
                 } catch {
                     throw new Error('Invalid amount! Amount must be number');
                 }
@@ -74,109 +95,109 @@ const DashBoard: React.FC = () => {
     }, [monthSelected, yearSelected])
 
     const totalGains = useMemo(() => {
-        let total: number = 0;
+        let totalGain: number = 0;
 
-        gains.forEach(item => {
+        vendas.forEach(item => {
             const date = new Date(item.date);
             const year = date.getFullYear();
             const month = date.getMonth() + 1;
 
             if (month === monthSelected && year === yearSelected) {
                 try {
-                    total += Number(item.amount);
+                    totalGain += Number(item.gain);
                 } catch {
                     throw new Error('Invalid amount! Amount must be number');
                 }
             }
         });
-        return total;
+        return totalGain;
     }, [monthSelected, yearSelected])
 
     const totalBalance = useMemo(() => {
-        return totalGains - totalExpenses;
-    }, [totalGains, totalExpenses])
+        return totalGains;
+    }, [totalBuys, totalSells])
 
     const message = useMemo(() => {
-        if (totalGains === 0 && totalExpenses === 0) {
+        if (totalBuys === 0 && totalSells === 0) {
             return {
                 title: 'Ops!',
                 description: 'Não há registros!',
-                footerText: 'Registre seus gastos e ganhos!',
+                footerText: 'Registre seus investimentos!',
                 icon: opsImg
             }
         } else if (totalBalance < 0) {
             return {
                 title: 'Que triste!',
-                description: 'Nesse mês você gastou mais do que deveria!',
-                footerText: 'Verifique seus gastos e tente cortar algumas coisas desnecessárias!',
+                description: 'Nesse mês você perdeu dinheiro!',
+                footerText: 'Tente investir com mais sabedoria!',
                 icon: sadImg
             }
         } else if (totalBalance === 0) {
             return {
                 title: 'Ufa!',
-                description: 'Nesse mês você gastou no limite!',
-                footerText: 'Tenha cuidado. No próximo mês tente poupar o seu dinheiro!',
+                description: 'Nesse mês você não perdeu nem ganhou!',
+                footerText: 'Tenha cuidado. No próximo mês tente investir melhor!',
                 icon: grinningImg
             }
         } else {
             return {
                 title: 'Muito bem!',
                 description: 'Sua carteira está positiva!',
-                footerText: 'Continue assim. Considere investir o seu saldo!',
+                footerText: 'Continue assim.!',
                 icon: happyImg
             }
         }
-    }, [totalBalance, totalGains, totalExpenses])
+    }, [totalBalance, totalBuys, totalSells])
 
-    const relationExpensesGains = useMemo(() => {
-        const total = totalGains + totalExpenses;
+    const relationSellsGuys = useMemo(() => {
+        const total = totalBuys + Number(totalSells);
 
-        const percentGains = (totalGains / total) * 100;
-        const percentExpenses = (totalExpenses / total) * 100;
+        const percentGains = (totalBuys / total) * 100;
+        const percentExpenses = (Number(totalSells) / total) * 100;
 
         const data = [
             {
-                name: 'Entradas',
-                value: totalGains,
+                name: 'Compras',
+                value: totalBuys,
                 percent: Number(percentGains.toFixed(1)) || 0,
                 color: '#f7931b'
             },
             {
-                name: 'Saídas',
-                value: totalExpenses,
+                name: 'Vendas',
+                value: totalSells,
                 percent: Number(percentExpenses.toFixed(1)) || 0,
                 color: '#e44c4e'
             },
         ]
         return data;
-    }, [totalGains, totalExpenses])
+    }, [totalBuys, totalSells])
 
     const historyData = useMemo(() => {
         return listOfMonths
             .map((_, month) => {
                 let amountEntry = 0;
-                gains.forEach(gain => {
-                    const date = new Date(gain.date);
-                    const gainMonth = date.getMonth();
-                    const gainYear = date.getFullYear();
+                compras.forEach(buy => {
+                    const date = new Date(buy.date);
+                    const buyMonth = date.getMonth();
+                    const buyYear = date.getFullYear();
 
-                    if (gainMonth === month && gainYear === yearSelected) {
+                    if (buyMonth === month && buyYear === yearSelected) {
                         try {
-                            amountEntry += Number(gain.amount);
+                            amountEntry += Number(buy.amount) * Number(buy.amount);
                         } catch {
                             throw new Error('amountEntry is invalid. amountEntry must be valid number');
                         }
                     }
                 })
                 let amountOutput = 0;
-                expenses.forEach(expense => {
-                    const date = new Date(expense.date);
-                    const expenseMonth = date.getMonth();
-                    const expenseYear = date.getFullYear();
+                vendas.forEach(sell => {
+                    const date = new Date(sell.date);
+                    const sellMonth = date.getMonth();
+                    const sellYear = date.getFullYear();
 
-                    if (expenseMonth === month && expenseYear === yearSelected) {
+                    if (sellMonth === month && sellYear === yearSelected) {
                         try {
-                            amountOutput += Number(expense.amount);
+                            amountOutput += Number(sell.price) * Number(sell.amount);
                         } catch {
                             throw new Error('amountOutput is invalid. amountOutput must be valid number');
                         }
@@ -186,90 +207,49 @@ const DashBoard: React.FC = () => {
                     monthNumber: month,
                     month: listOfMonths[month].substr(0, 3),
                     amountEntry,
-                    amountOutput
+                    amountOutput,
                 }
             })
             .filter(item => {
-                const currentMonth = new Date().getMonth();
+                const currentMonth = 10;
                 const currentYear = new Date().getFullYear();
 
                 return (yearSelected === currentYear && item.monthNumber <= currentMonth) || (yearSelected < currentYear)
             });
     }, [yearSelected])
 
-    const relationExpensevesRecurrentEventual = useMemo(() => {
-        let amountRecurrent = 0;
-        let amountEventual = 0;
+    const historyDataGains = useMemo(() => {
+        return listOfMonths
+            .map((_, month) => {
+                let priceOutput = 0;
+                let name = '';
+                vendas.forEach(sell => {
+                    const date = new Date(sell.date);
+                    const sellMonth = date.getMonth();
+                    const sellYear = date.getFullYear();
 
-        expenses
-            .filter((expense) => {
-                const date = new Date(expense.date);
-                const year = date.getFullYear();
-                const month = date.getMonth() + 1;
-
-                return month === monthSelected && year === yearSelected;
-            })
-            .forEach((expense) => {
-                if (expense.frequency === 'recorrente') {
-                    return amountRecurrent += Number(expense.amount);
-                }
-                if (expense.frequency === 'eventual') {
-                    return amountEventual += Number(expense.amount);
-                }
-            })
-        const total = amountRecurrent + amountEventual;
-        return [
-            {
-                name: 'Recorrentes',
-                amount: amountRecurrent,
-                percent: Number(((amountRecurrent / total) * 100).toFixed(1)) || 0,
-                color: '#f7931b'
-            },
-            {
-                name: 'Eventuais',
-                amount: amountEventual,
-                percent: Number(((amountEventual / total) * 100).toFixed(1)) || 0,
-                color: '#e44c4e'
-            }
-        ];
-    }, [monthSelected, yearSelected])
-
-    const relationGainsRecurrentEventual = useMemo(() => {
-        let amountRecurrent = 0;
-        let amountEventual = 0;
-
-        gains
-            .filter((gain) => {
-                const date = new Date(gain.date);
-                const year = date.getFullYear();
-                const month = date.getMonth() + 1;
-
-                return month === monthSelected && year === yearSelected;
-            })
-            .forEach((gain) => {
-                if (gain.frequency === 'recorrente') {
-                    return amountRecurrent += Number(gain.amount);
-                }
-                if (gain.frequency === 'eventual') {
-                    return amountEventual += Number(gain.amount);
+                    if (sellMonth === month && sellYear === yearSelected) {
+                        try {
+                            name = String(sell.active);
+                            priceOutput += Number(sell.price) * Number(sell.amount);
+                        } catch {
+                            throw new Error('amountOutput is invalid. amountOutput must be valid number');
+                        }
+                    }
+                });
+                return {
+                    monthNumber: month,
+                    name,
+                    uv: priceOutput,
                 }
             })
-        const total = amountRecurrent + amountEventual;
-        return [
-            {
-                name: 'Recorrentes',
-                amount: amountRecurrent,
-                percent: Number(((amountRecurrent / total) * 100).toFixed(1)) || 0,
-                color: '#f7931b'
-            },
-            {
-                name: 'Eventuais',
-                amount: amountEventual,
-                percent: Number(((amountEventual / total) * 100).toFixed(1)) || 0,
-                color: '#e44c4e'
-            }
-        ];
-    }, [monthSelected, yearSelected])
+            .filter(item => {
+                const currentMonth = 10;
+                const currentYear = new Date().getFullYear();
+
+                return (yearSelected === currentYear && item.monthNumber <= currentMonth) || (yearSelected < currentYear)
+            });
+    }, [yearSelected])
 
     const handleMonthSelected = useCallback((month: string) => {
         try {
@@ -305,23 +285,23 @@ const DashBoard: React.FC = () => {
                 </ContentHeader>
                 <Content>
                     <WalletBox
-                        title='Saldo'
+                        title='Ganhos'
                         color='#4e41f0'
                         amount={totalBalance}
                         footerLabel='atualizado com base nas entradas e saidas'
                         icon='dolar'
                     />
                     <WalletBox
-                        title='entradas'
+                        title='Compras'
                         color='#f7931b'
-                        amount={totalGains}
+                        amount={totalBuys}
                         footerLabel='atualizado com base nas entradas e saidas'
                         icon='arrowUp'
                     />
                     <WalletBox
-                        title='saídas'
+                        title='Vendas'
                         color='#e44c4e'
-                        amount={totalExpenses}
+                        amount={totalSells}
                         footerLabel='atualizado com base nas entradas e saidas'
                         icon='arrowDown'
                     />
@@ -331,18 +311,15 @@ const DashBoard: React.FC = () => {
                         footerText={message.footerText}
                         icon={message.icon}
                     />
-                    <PieChartBox data={relationExpensesGains} />
+                    <PieChartBox data={relationSellsGuys} />
                     <HistoryBox
                         data={historyData}
                         lineColorAmountEntry='#f7931b'
                         lineColorAmountOutput='#e44c4e'
                     />
-                    <BarChartBox
-                        title='Saídas'
-                        data={relationExpensevesRecurrentEventual} />
-                    <BarChartBox
-                        title='Entradas'
-                        data={relationGainsRecurrentEventual} />
+                    <HistoryBoxGains 
+                        data={historyDataGains}
+                    />
                 </Content>
             </Container>
     );

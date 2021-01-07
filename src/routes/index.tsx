@@ -9,7 +9,7 @@ const Routes: React.FC = () => {
     const {logged} = useAuth();
     return (
     <BrowserRouter>
-        {true ? <App/> : <Auth/>}
+        {logged ? <App/> : <Auth/>}
     </BrowserRouter>
 );
 }

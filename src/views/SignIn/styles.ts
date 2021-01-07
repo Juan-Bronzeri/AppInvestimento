@@ -8,7 +8,7 @@ export const Container = styled.div`
     justify-content: center;
     align-items: center;
 
-    background-color: ${props => props.theme.colors.primary};
+    background: ${props => props.theme.colors.primary};
 `;
 export const Logo = styled.div`
     display: flex;
