@@ -5,7 +5,8 @@ import ContentHeader from '../../components/ContentHeader';
 import SelectInput from '../../components/SelectInput';
 import HistoryFinanceCard from '../../components/HistoryFinanceCard';
 
-import active from '../../repositories/active';
+import sell from '../../repositories/vendas';
+import buy from '../../repositories/compra';
 
 import formatCurrency from '../../utils/formatCurrency';
 import formatDate from '../../utils/formatDate';
@@ -16,6 +17,10 @@ import {
     Content,
     Filters
 } from './styles';
+import { useDispatch, useSelector } from 'react-redux';
+import { StoreState } from '../../store/createStore';
+import { getActiveSellRequest } from '../../store/modules/activeSell/actions';
+import { getActiveBuyRequest } from '../../store/modules/activeBuy/actions';
 
 interface IRouteParams {
     match: {
@@ -29,10 +34,11 @@ interface IData {
     id: string;
     description: string;
     price: number;
-    amount: string;
+    amount: number;
     total: string;
     dateFormated: string;
     tagColor: string;
+    gain?: number;
 }
 
 const List: React.FC<IRouteParams> = ({ match }) => {
@@ -41,17 +47,36 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     const [yearSelected, setYearSelected] = useState<number>(new Date().getFullYear());
     const [frequencyFilterSelected, setFrequencyFilterSelected] = useState(['gain', 'lose']);
 
+    const ActiveBuy = useSelector((state: StoreState) => state.activeBuy);
+    const ActiveSell = useSelector((state: StoreState) => state.activeSell);
+    const dispatch = useDispatch();
+
+    
     const activeValueDay = 15;
     const movimentType = match.params.type;
     console.log(movimentType);
 
+    useEffect(() => {
+        movimentType === 'entry-balance' ?
+            dispatch(getActiveBuyRequest())
+            :
+            dispatch(getActiveSellRequest())
+    }, [dispatch, movimentType])
+
     const pageData = useMemo(() => {
-        return {
-            title: 'Entradas',
-            lineColor: '#53cc5d',
-            data: active
-        }
-    }, []);
+        return movimentType === 'entry-balance' ?
+            {
+                title: 'Compras',
+                lineColor: '#53cc5d',
+                data: ActiveBuy.Active
+            }
+            :
+            {
+                title: 'Vendas',
+                lineColor: '#53cc5d',
+                data: ActiveSell.Active
+            }
+    }, [movimentType, ActiveBuy.Active, ActiveSell.Active]);
 
     const years = useMemo(() => {
         let uniqueYears: number[] = [];
@@ -116,19 +141,20 @@ const List: React.FC<IRouteParams> = ({ match }) => {
             const date = new Date(item.date);
             const month = date.getMonth() + 1;
             const year = date.getFullYear();
-            const frequency = activeValueDay + (activeValueDay * 0.1) < Number(item.price) ? 'gain' : 'lose'
+            const frequency = activeValueDay + (activeValueDay * 0.1) > Number(item.valueActive) ? 'gain' : 'lose'
 
             return month === monthSelected && year === yearSelected && frequencyFilterSelected.includes(frequency);
         });
         const formatedData = filteredData.map(item => {
             return {
                 id: uuid_v4(),
-                description: item.Active,
+                description: item.active,
                 amount: item.amount,
-                price: Number(item.price),
-                total: formatCurrency(Number(item.price) * Number(item.amount)),
+                price: item.valueActive,
+                total: formatCurrency(Number(item.valueActive) * Number(item.amount)),
                 dateFormated: formatDate(item.date),
-                tagColor: activeValueDay + (activeValueDay * 0.1) < Number(item.price) ? '#00cc29' : '#85040b'
+                tagColor: activeValueDay + (activeValueDay * 0.1) > Number(item.valueActive) ? '#00cc29' : '#85040b',
+                gain: item.gain
             }
         });
         setData(formatedData);
@@ -180,10 +206,10 @@ const List: React.FC<IRouteParams> = ({ match }) => {
                             tagColor={item.tagColor}
                             title={item.description}
                             subtitle={item.dateFormated}
-                            price = {item.price}
+                            price={item.price}
                             total={item.total}
                             amount={item.amount}
-                            activeValueDay = {activeValueDay}
+                            gain={item.gain}
                         />
                     ))
                 }

@@ -204,7 +204,6 @@ const DashBoard: React.FC = () => {
                     }
                 });
                 return {
-                    monthNumber: month,
                     month: listOfMonths[month].substr(0, 3),
                     amountEntry,
                     amountOutput,
@@ -214,7 +213,7 @@ const DashBoard: React.FC = () => {
                 const currentMonth = 10;
                 const currentYear = new Date().getFullYear();
 
-                return (yearSelected === currentYear && item.monthNumber <= currentMonth) || (yearSelected < currentYear)
+                return (yearSelected === currentYear) || (yearSelected < currentYear)
             });
     }, [yearSelected])
 
@@ -222,7 +221,6 @@ const DashBoard: React.FC = () => {
         return listOfMonths
             .map((_, month) => {
                 let priceOutput = 0;
-                let name = '';
                 vendas.forEach(sell => {
                     const date = new Date(sell.date);
                     const sellMonth = date.getMonth();
@@ -230,24 +228,21 @@ const DashBoard: React.FC = () => {
 
                     if (sellMonth === month && sellYear === yearSelected) {
                         try {
-                            name = String(sell.active);
-                            priceOutput += Number(sell.price) * Number(sell.amount);
+                            priceOutput += Number(sell.gain);
                         } catch {
                             throw new Error('amountOutput is invalid. amountOutput must be valid number');
                         }
                     }
                 });
                 return {
-                    monthNumber: month,
-                    name,
+                    name: listOfMonths[month].substr(0, 3),
                     uv: priceOutput,
                 }
             })
             .filter(item => {
-                const currentMonth = 10;
                 const currentYear = new Date().getFullYear();
 
-                return (yearSelected === currentYear && item.monthNumber <= currentMonth) || (yearSelected < currentYear)
+                return (yearSelected === currentYear) || (yearSelected < currentYear)
             });
     }, [yearSelected])
 

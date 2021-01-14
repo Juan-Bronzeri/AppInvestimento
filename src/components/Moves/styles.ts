@@ -6,14 +6,7 @@ interface ITitleContainerProps {
 }
 
 export const Container = styled.div`
-    height: 100%;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    background-color: ${props => props.theme.colors.primary};
+  
 `;
 
 export const Form = styled.div`
@@ -110,6 +103,21 @@ export const ValueActive = styled.div`
         padding-left: 5px;
         margin-left: 10px;
         width: 10%;
+}
+`;
+export const Active = styled.div`
+    display: flex;
+    margin-top: 10px;
+
+    > input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        
+    }
+    > input {
+        border-radius: 5px;
+        padding-left: 5px;
+        margin-left: 10px;
+        width: 100%;
 }
 `;
 
