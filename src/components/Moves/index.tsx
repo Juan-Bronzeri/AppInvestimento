@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Button from '../../components/Button';
 import Input from '../../components/Input';
+import { StoreState } from '../../store/createStore';
+import { addActiveBuyRequest } from '../../store/modules/activeAddBuy/actions';
 
 import {
     Container,
@@ -25,14 +28,18 @@ const Moves: React.FC = () => {
     const [valueB3, setValueB3] = useState(0);
     const [valueBroker, setValueBroker] = useState(0);
     const [valueActive, setValueActive] = useState(0);
-  
+
     useEffect(() => {
-      (document.getElementById('CountInput') as HTMLInputElement).value = String(count);
-      (document.getElementById('B3input') as HTMLInputElement).value = String(valueB3);
-      (document.getElementById('BrokerInput') as HTMLInputElement).value = String(valueBroker);
-      (document.getElementById('ValueActiveInput') as HTMLInputElement).value = String(valueActive);
-      (document.getElementById('ActiveInput') as HTMLInputElement).value = active;
-    }, [count, valueB3, valueBroker, valueActive]);
+        (document.getElementById('CountInput') as HTMLInputElement).value = String(count);
+        (document.getElementById('B3input') as HTMLInputElement).value = String(valueB3);
+        (document.getElementById('BrokerInput') as HTMLInputElement).value = String(valueBroker);
+        (document.getElementById('ValueActiveInput') as HTMLInputElement).value = String(valueActive);
+        (document.getElementById('ActiveInput') as HTMLInputElement).value = active;
+    }, [count, valueB3, valueBroker, valueActive, active]);
+
+    const ActiveBuy = useSelector((state: StoreState) => state.activeAddBuy);
+    const dispatch = useDispatch();
+    console.log(ActiveBuy)
     return (
         <Container>
             <Form >
@@ -93,10 +100,26 @@ const Moves: React.FC = () => {
                         </PlusButton>
                     </CounterActive>
                 </FormActiveCounter>
-                <Button type="submit" >Comprar</Button>
+                <Button type="submit" onClick={() => dispatch(addActiveBuyRequest({
+                    active: active,
+                    amount: count,
+                    valueB3: valueB3,
+                    valueBroker: valueBroker,
+                    valueActive: valueActive,
+                    date: String(new Date())
+                }))}>Comprar</Button>
             </Form>
         </Container>
     )
+    // {
+    //     "id": 5,
+    //     "active": "PTR4",
+    //     "amount": 1,
+    //     "valueB3": 10,
+    //     "valueBroker": 10,
+    //     "valueActive": 2,
+    //     "date": "01/01/2021"
+    // }
 }
 
 export default Moves;
