@@ -38,7 +38,6 @@ interface IData {
     total: string;
     dateFormated: string;
     tagColor: string;
-    gain?: number;
 }
 
 const List: React.FC<IRouteParams> = ({ match }) => {
@@ -46,6 +45,7 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     const [monthSelected, setMonthSelected] = useState<number>(new Date().getMonth() + 1);
     const [yearSelected, setYearSelected] = useState<number>(new Date().getFullYear());
     const [frequencyFilterSelected, setFrequencyFilterSelected] = useState(['gain', 'lose']);
+    const [click, setClick] = useState();
 
     const ActiveBuy = useSelector((state: StoreState) => state.activeBuy);
     const ActiveSell = useSelector((state: StoreState) => state.activeSell);
@@ -55,6 +55,10 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     const activeValueDay = 15;
     const movimentType = match.params.type;
     console.log(movimentType);
+
+    useEffect(() => {
+
+    })
 
     useEffect(() => {
         movimentType === 'entry-balance' ?
@@ -141,7 +145,7 @@ const List: React.FC<IRouteParams> = ({ match }) => {
             const date = new Date(item.date);
             const month = date.getMonth() + 1;
             const year = date.getFullYear();
-            const frequency = activeValueDay + (activeValueDay * 0.1) > Number(item.valueActive) ? 'gain' : 'lose'
+            const frequency = Number(item.gain) > 0 ? 'gain' : 'lose'
 
             return month === monthSelected && year === yearSelected && frequencyFilterSelected.includes(frequency);
         });
@@ -151,10 +155,9 @@ const List: React.FC<IRouteParams> = ({ match }) => {
                 description: item.active,
                 amount: item.amount,
                 price: item.valueActive,
-                total: formatCurrency(Number(item.valueActive) * Number(item.amount)),
+                total: formatCurrency(Number(item.gain)),
                 dateFormated: formatDate(item.date),
-                tagColor: activeValueDay + (activeValueDay * 0.1) > Number(item.valueActive) ? '#00cc29' : '#85040b',
-                gain: item.gain
+                tagColor: Number(item.gain) > 0 ? '#00cc29' : '#85040b',
             }
         });
         setData(formatedData);
@@ -209,7 +212,6 @@ const List: React.FC<IRouteParams> = ({ match }) => {
                             price={item.price}
                             total={item.total}
                             amount={item.amount}
-                            gain={item.gain}
                         />
                     ))
                 }
