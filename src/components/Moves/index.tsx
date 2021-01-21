@@ -100,26 +100,19 @@ const Moves: React.FC = () => {
                         </PlusButton>
                     </CounterActive>
                 </FormActiveCounter>
-                <Button type="submit" onClick={() => dispatch(addActiveBuyRequest({
+                <Button type="submit" onClick={() => {
+                    var data = new Date()
+                    dispatch(addActiveBuyRequest({
                     active: active,
                     amount: count,
                     valueB3: valueB3,
                     valueBroker: valueBroker,
                     valueActive: valueActive,
-                    date: String(new Date())
-                }))}>Comprar</Button>
+                    date: String(data.getMonth() + 1) + "/" + ((data.getDate()) + "/" + data.getFullYear())
+                }))}}>Comprar</Button>
             </Form>
         </Container>
     )
-    // {
-    //     "id": 5,
-    //     "active": "PTR4",
-    //     "amount": 1,
-    //     "valueB3": 10,
-    //     "valueBroker": 10,
-    //     "valueActive": 2,
-    //     "date": "01/01/2021"
-    // }
 }
 
 export default Moves;

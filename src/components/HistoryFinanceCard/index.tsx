@@ -11,7 +11,6 @@ interface IHistoryFinanceCardProps {
     price: number;
     total: string;
     amount: number;
-    gain?: number;
 }
 
 const HistoryFinanceCard: React.FC<IHistoryFinanceCardProps> = ({
@@ -21,7 +20,6 @@ const HistoryFinanceCard: React.FC<IHistoryFinanceCardProps> = ({
     price,
     amount,
     total,
-    gain
 }) => (
     <Container>
         <Tag color={tagColor}/>
@@ -30,7 +28,7 @@ const HistoryFinanceCard: React.FC<IHistoryFinanceCardProps> = ({
             <small>{subtitle}</small>
         </div>
         <h3>
-            {gain}{total}
+            {total}
         </h3>
     </Container>
 );
