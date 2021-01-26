@@ -51,7 +51,7 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     const ActiveSell = useSelector((state: StoreState) => state.activeSell);
     const dispatch = useDispatch();
 
-    
+
     const activeValueDay = 15;
     const movimentType = match.params.type;
     console.log(movimentType);
@@ -65,9 +65,16 @@ const List: React.FC<IRouteParams> = ({ match }) => {
             dispatch(getActiveBuyRequest())
             :
             dispatch(getActiveSellRequest())
+        setData([])
     }, [dispatch, movimentType])
 
     const pageData = useMemo(() => {
+        if(ActiveBuy.Active[0].active === 'null') 
+        {
+            setData([]) 
+        }
+        console.log(data.length)
+        console.log(data)
         return movimentType === 'entry-balance' ?
             {
                 title: 'Compras',
@@ -165,57 +172,63 @@ const List: React.FC<IRouteParams> = ({ match }) => {
 
     return (
         <Container>
-            <ContentHeader title={pageData.title} lineColor={pageData.lineColor}>
-                <SelectInput
-                    options={months}
-                    onChange={(e) => handleMonthSelected(e.target.value)}
-                    defaultValue={monthSelected}
-                />
-                <SelectInput
-                    options={years}
-                    onChange={(e) => handleYearSelected(e.target.value)}
-                    defaultValue={yearSelected}
-                />
-            </ContentHeader>
-            <Filters>
-                <button
-                    type="button"
-                    className={`
+            {
+                data.length > 0 &&
+                <>
+                    <ContentHeader title={pageData.title} lineColor={pageData.lineColor}>
+                        <SelectInput
+                            options={months}
+                            onChange={(e) => handleMonthSelected(e.target.value)}
+                            defaultValue={monthSelected}
+                        />
+                        <SelectInput
+                            options={years}
+                            onChange={(e) => handleYearSelected(e.target.value)}
+                            defaultValue={yearSelected}
+                        />
+                    </ContentHeader>
+                    <Filters>
+                        <button
+                            type="button"
+                            className={`
                         tag-filter 
                         tag-filter-recurrent
                         ${frequencyFilterSelected.includes('gain') && 'tag-actived'}
                         `}
-                    onClick={() => handleFrequencyClick('gain')}
-                >
-                    Ganhos
+                            onClick={() => handleFrequencyClick('gain')}
+                        >
+                            Ganhos
                     </button>
-                <button
-                    type="button"
-                    className={`
+                        <button
+                            type="button"
+                            className={`
                         tag-filter 
                         tag-filter-eventual
                         ${frequencyFilterSelected.includes('lose') && 'tag-actived'}
                         `}
-                    onClick={() => handleFrequencyClick('lose')}
-                >
-                    Perdas
+                            onClick={() => handleFrequencyClick('lose')}
+                        >
+                            Perdas
                     </button>
-            </Filters>
-            <Content>
-                {
-                    data.map(item => (
-                        <HistoryFinanceCard
-                            key={item.id}
-                            tagColor={item.tagColor}
-                            title={item.description}
-                            subtitle={item.dateFormated}
-                            price={item.price}
-                            total={item.total}
-                            amount={item.amount}
-                        />
-                    ))
-                }
-            </Content>
+                    </Filters>
+                    <Content>
+                        {
+                            data.map(item => (
+                                <HistoryFinanceCard
+                                    key={item.id}
+                                    tagColor={item.tagColor}
+                                    title={item.description}
+                                    subtitle={item.dateFormated}
+                                    price={item.price}
+                                    total={item.total}
+                                    amount={item.amount}
+                                />
+                            ))
+                        }
+                    </Content>
+                </>
+            }
+
         </Container>
     );
 }
